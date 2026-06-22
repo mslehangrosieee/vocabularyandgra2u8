@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ms Lê Hằng English - Interactive Quiz</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(-45deg, #8854C0, #E0C3FC, #00C9A7, #FDCB6E);
+            --correct-color: #00D26A;
+            --wrong-color: #FF4757;
+            --text-main: #2D3436;
+            --card-shadow: 0 8px 0 #DFE6E9;
+            --btn-shadow: 0 5px 0 #b2bec3;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        body {
+            background: var(--primary-gradient);
+            background-size: 400% 400%;
+            animation: gradientMovement 12s ease infinite;
+            min-height: 100vh;
+            color: var(--text-main);
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Hiệu ứng nền hoạ tiết lơ lửng */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.12;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><text x='10' y='30' font-size='20'>⭐</text><text x='50' y='30' font-size='18'>🌸</text><text x='20' y='70' font-size='22'>🐱</text><text x='60' y='70' font-size='16'>🍎</text></svg>");
+        }
+
+        @keyframes gradientMovement {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 750px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header phong cách Ms Lê Hằng English */
+        header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 6px 0 rgba(0,0,0,0.1);
+            border: 3px solid #fff;
+        }
+
+        header h1 {
+            font-size: 1.3rem;
+            color: #8854C0;
+            font-weight: 900;
+            margin-bottom: 5px;
+        }
+
+        /* Khung nhắc nhở quan trọng */
+        .alert-box {
+            background: #FFEAA7;
+            border: 3px solid #FDCB6E;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 0 #E1B12C;
+            text-align: center;
+        }
+
+        .alert-box h2 {
+            font-size: 1.1rem;
+            color: #D35400;
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+
+        .alert-box p {
+            font-size: 0.95rem;
+            font-weight: 700;
+            line-height: 1.4;
+            color: #2D3436;
+        }
+
+        /* Danh mục bài tập */
+        .section-title {
+            background: #00C9A7;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 900;
+            margin: 30px 0 15px 0;
+            display: inline-block;
+            box-shadow: 0 4px 0 #00A88F;
+            border: 2px solid #white;
+        }
+
+        /* Thẻ bài tập dạng Card */
+        .quiz-card {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: var(--card-shadow);
+            border: 4px solid #F1F2F6;
+            transition: transform 0.2s;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 900;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .conversation-box {
+            background: #F8F9FA;
+            border-left: 5px solid #8854C0;
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            font-weight: 700;
+        }
+
+        /* Lưới đáp án */
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: white;
+            border: 3px solid #E4E7EB;
+            border-radius: 15px;
+            padding: 14px 20px;
+            text-align: left;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: var(--btn-shadow);
+            transition: all 0.1s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .option-btn:hover {
+            transform: scale(1.015);
+            background: #F8F9FA;
+            border-color: #B2BEC3;
+        }
+
+        .option-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #b2bec3;
+        }
+
+        /* Trạng thái đúng sai */
+        .option-btn.correct {
+            background-color: var(--correct-color) !important;
+            color: white !important;
+            border-color: #00B359 !important;
+            box-shadow: 0 4px 0 #00994C !important;
+        }
+
+        .option-btn.wrong {
+            background-color: var(--wrong-color) !important;
+            color: white !important;
+            border-color: #E63946 !important;
+            box-shadow: 0 4px 0 #CC2E3A !important;
+            animation: shakeAnimation 0.4s ease;
+        }
+
+        @keyframes shakeAnimation {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+
+        /* Khung giải thích siêu chi tiết */
+        .explanation-box {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: #F0F3F4;
+            border-radius: 15px;
+            border-left: 6px solid #8854C0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .explanation-box h4 {
+            color: #8854C0;
+            font-weight: 900;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .explanation-box p {
+            margin-bottom: 6px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Khung hiển thị mô phỏng hình ảnh biển báo/tin nhắn điện thoại bằng CSS */
+        .sign-graphic {
+            background: #FFD200;
+            border: 4px solid #000;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            font-weight: 900;
+            font-size: 1.1rem;
+            color: #000;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 0 #B39200;
+            max-width: 280px;
+        }
+
+        .phone-graphic {
+            background: #E5E5EA;
+            border-radius: 20px;
+            padding: 15px;
+            max-width: 300px;
+            margin-bottom: 15px;
+            border: 2px solid #D1D1D6;
+            box-shadow: 0 4px 0 #C7C7CC;
+        }
+        .phone-bubble {
+            background: #007AFF;
+            color: white;
+            padding: 10px 14px;
+            border-radius: 15px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        /* Nút nộp bài tổng kết */
+        .submit-bar {
+            text-align: center;
+            margin: 4px 0 50px 0;
+        }
+
+        .btn-submit {
+            background: #FF4757;
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 1.25rem;
+            font-weight: 900;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #C53240;
+            transition: all 0.1s ease;
+        }
+
+        .btn-submit:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #C53240;
+        }
+
+        /* Popup kết quả Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 25px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            border: 5px solid #FDCB6E;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-score {
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: #8854C0;
+            margin: 15px 0;
+        }
+
+        .modal-feedback {
+            font-size: 1.1rem;
+            font-weight: 700;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            color: #2D3436;
+        }
+
+        .btn-close-modal {
+            background: #00C9A7;
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            font-weight: 900;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #00967D;
+        }
+
+        #confetti-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 99;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <div class="container">
+        <!-- HEADER -->
+        <header>
+            <h1>Giáo viên tạo: Ms Lê Hằng English ✨</h1>
+        </header>
+
+        <!-- LỜI NHẮC CỦA CÔ -->
+        <div class="alert-box">
+            <h2>⚠️ LỜI NHẮC CỰC KỲ QUAN TRỌNG ⚠️</h2>
+            <p>Chỉ có đọc kỹ giải thích ngay sau mỗi câu, sau đó ghi lại từ vựng/cấu trúc mới vào vở để học thì mới thực sự giỏi lên.</p>
+            <p style="margin-top: 5px; color: #C0392B;">Làm cho xong mà không đọc giải thích hay đọc qua loa không ghi chép thì chỉ tốn thời gian vô ích!</p>
+            <p style="margin-top: 8px; font-style: italic; color: #2980B9;">* Kéo tới đâu, làm tới đó! *</p>
+        </div>
+
+        <!-- PHẦN CÂU HỎI -->
+        <div id="quiz-wrapper">
+            <!-- Questions dynamically generated here by JavaScript -->
+        </div>
+
+        <!-- THANH NỘP BÀI -->
+        <div class="submit-bar">
+            <button class="btn-submit" onclick="gradeQuiz()">🎉 NỘP BÀI KIỂM TRA 🎉</button>
+        </div>
+    </div>
+
+    <!-- MODAL KẾT QUẢ -->
+    <div class="modal-overlay" id="score-modal">
+        <div class="modal-content">
+            <h2>📊 KẾT QUẢ BÀI THI 📊</h2>
+            <div class="modal-score" id="score-text">0 / 0</div>
+            <div class="modal-feedback" id="feedback-text">Cố lên con nhé!</div>
+            <button class="btn-close-modal" onclick="closeModal()">Làm lại bài thi 🔁</button>
+        </div>
+    </div>
+
+    <script>
+        // DỮ LIỆU ĐỀ BÀI HOÀN CHỈNH 100% KHÔNG CẮT XÉN KÈM GIẢI THÍCH SIÊU CHI TIẾT
+        const quizQuestions = [
+            {
+                id: 1,
+                section: "Exercise 16: Choose the word or phrase (A, B, C, or D) that best completes each of the following exchanges.",
+                type: "text",
+                speaker: "Ba: \"Why don’t we take a trip to my home town?\"\nNam: \"_______\"",
+                options: [
+                    "Yes, we do.",
+                    "That’s a good idea.",
+                    "Not at all.",
+                    "You’re welcome."
+                ],
+                answer: "That’s a good idea.",
+                explanation: {
+                    translation: "Dịch nghĩa câu hỏi: Ba hỏi: 'Tại sao chúng ta không thực hiện một chuyến đi về quê của tớ nhỉ?' - Nam phản hồi lại.",
+                    vocab: "Phân tích 4 đáp án:<br>A. Yes, we do: Vâng, chúng tớ có làm (Dùng trả lời cho câu hỏi Do you...).<br>B. That’s a good idea: Đó là một ý kiến hay (Dùng để đồng tình với một lời đề nghị).<br>C. Not at all: Không có gì đâu/ Không sao đâu (Dùng đáp lại lời cảm ơn hoặc xin lỗi).<br>D. You’re welcome: Không có gì (Dùng đáp lại lời cảm ơn).",
+                    whyCorrect: "Tại sao chọn B? Cấu trúc 'Why don't we + V...?' là câu đưa ra một lời gợi ý, đề xuất cùng làm gì. Cách đáp lại lịch sự và phổ biến nhất khi đồng ý với lời đề nghị này là 'That's a good idea'.",
+                    whyWrong: "Tại sao loại A, C, D? Các đáp án này bị sai ngữ cảnh giao tiếp, không dùng để đáp lại cấu trúc gợi ý mang tính rủ rê."
+                }
+            },
+            {
+                id: 2,
+                section: "Exercise 16: Choose the word or phrase (A, B, C, or D) that best completes each of the following exchanges.",
+                type: "text",
+                speaker: "Lan: \"What are you doing there?\"\nNam: \"_______\"",
+                options: [
+                    "Lots of things.",
+                    "Good idea.",
+                    "Ok.",
+                    "Not at all."
+                ],
+                answer: "Lots of things.",
+                explanation: {
+                    translation: "Dịch nghĩa câu hỏi: Lan hỏi: 'Cậu đang làm gì ở đó thế?' - Nam trả lời.",
+                    vocab: "Phân tích 4 đáp án:<br>A. Lots of things: Nhiều thứ lắm.<br>B. Good idea: Ý kiến hay đấy.<br>C. Ok: Được rồi.<br>D. Not at all: Không có gì.",
+                    whyCorrect: "Tại sao chọn A? Câu hỏi 'What are you doing...?' dùng để hỏi về hành động cụ thể đang làm. Câu trả lời 'Lots of things' (Tớ đang làm nhiều thứ lắm) hoàn toàn phù hợp ngữ cảnh để trả lời cho câu hỏi làm cái gì.",
+                    whyWrong: "Tại sao loại B, C, D? 'Good idea' và 'Ok' dùng cho lời mời hoặc đề xuất; 'Not at all' dùng đáp lại lời cảm ơn, tất cả đều lạc đề so với câu hỏi của Lan."
+                }
+            },
+            {
+                id: 3,
+                section: "Exercise 16: Choose the word or phrase (A, B, C, or D) that best completes each of the following exchanges.",
+                type: "text",
+                speaker: "Nick: You’ve made new friends?\nAly: \"_______\"",
+                options: [
+                    "Yes, I did.",
+                    "Yeah- right on the first day.",
+                    "Yes, please.",
+                    "You’re welcome."
+                ],
+                answer: "Yeah- right on the first day.",
+                explanation: {
+                    translation: "Dịch nghĩa câu hỏi: Nick hỏi: 'Cậu vừa mới kết bạn mới à?' - Aly trả lời.",
+                    vocab: "Phân tích 4 đáp án:<br>A. Yes, I did: Đúng vậy, tớ đã làm (Sai thì, câu hỏi dùng Hiện tại hoàn thành 'You've made').<br>B. Yeah- right on the first day: Ừ đúng rồi - ngay từ ngày đầu tiên luôn ấy.<br>C. Yes, please: Vâng, làm ơn (Dùng khi nhận lời mời ăn uống).<br>D. You’re welcome: Không có gì.",
+                    whyCorrect: "Tại sao chọn B? Đây là câu trả lời tự nhiên, khẳng định việc mình đã có bạn mới và bổ sung thông tin đầy cảm xúc 'ngay từ ngày đầu tiên'.",
+                    whyWrong: "Tại sao loại A, C, D? Câu A sai trợ động từ (did thay vì have). Câu C và D sai hoàn toàn về mặt ngữ cảnh giao tiếp cơ bản."
+                }
+            },
+            {
+                id: 4,
+                section: "Exercise 16: Choose the word or phrase (A, B, C, or D) that best completes each of the following exchanges.",
+                type: "text",
+                speaker: "Lan: “Have you ever ridden a cart?”\nNam: \"_______\"",
+                options: [
+                    "Yes, we do.",
+                    "That’s a good idea.",
+                    "No, but I’d like to.",
+                    "Not at all."
+                ],
+                answer: "No, but I’d like to.",
+                explanation: {
+                    translation: "Dịch nghĩa câu hỏi: Lan hỏi: 'Cậu đã bao giờ cưỡi/đi xe bò, xe ngựa kéo chưa?' - Nam phản hồi.",
+                    vocab: "Phân tích 4 đáp án:<br>A. Yes, we do: Sai cấu trúc trợ động từ của câu hỏi 'Have you ever...'.<br>B. That’s a good idea: Ý kiến hay đó (Dùng cho câu đề xuất).<br>C. No, but I’d like to: Chưa, nhưng tớ rất muốn thử.<br>D. Not at all: Không có gì.",
+                    whyCorrect: "Tại sao chọn B? Câu hỏi 'Have you ever + V3?' dùng hỏi về trải nghiệm trong đời. Cách đáp 'No, but I'd like to' vừa cung cấp thông tin là chưa từng thử, vừa thể hiện mong muốn trải nghiệm rất lịch sự.",
+                    whyWrong: "Tại sao loại A, B, D? Trả lời sai ngữ pháp hoặc hoàn toàn không ăn nhập với câu hỏi trải nghiệm."
+                }
+            },
+            {
+                id: 5,
+                section: "Exercise 16: Choose the word or phrase (A, B, C, or D) that best completes each of the following exchanges.",
+                type: "text",
+                speaker: "Nick: \"How is your stay there?\"\nNam: \"_______\"",
+                options: [
+                    "Yes, please.",
+                    "So exciting.",
+                    "Never mind.",
+                    "Sure"
+                ],
+                answer: "So exciting.",
+                explanation: {
+                    translation: "Dịch nghĩa câu hỏi: Nick hỏi: 'Kỳ nghỉ/Chuyến lưu trú của cậu ở đó thế nào rồi?' - Nam đưa ra cảm nhận.",
+                    vocab: "Phân tích 4 đáp án:<br>A. Yes, please: Vâng, làm ơn.<br>B. So exciting: Rất thú vị/ hào hứng luôn.<br>C. Never mind: Đừng bận tâm/ Không sao đâu.<br>D. Sure: Chắc chắn rồi.",
+                    whyCorrect: "Tại sao chọn B? Câu hỏi 'How is...?' yêu cầu một tính từ mô tả tính chất, trạng thái của sự việc. 'So exciting' là tính từ hoàn hảo để mô tả chuyến đi cực kỳ vui vẻ.",
+                    whyWrong: "Tại sao loại A, C, D? Các từ này không mang tính chất mô tả đặc điểm, không trả lời được cho từ để hỏi 'How'."
+                }
+            },
+            {
+                id: 6,
+                section: "Exercise 17: Choose the correct answer (A, B, C, or D) to arrange the following sentences into a meaningful conversation.",
+                type: "conversation",
+                speaker: "a. Brian: Me too, Ally. City life is too noisy for me.\nb. Ally: And look at all the green fields! It's so peaceful.\nc. Ally: It's so quiet here, Brian. I love the fresh air!",
+                options: [
+                    "a-b-c",
+                    "c-a-b",
+                    "c-b-a",
+                    "a-c-b"
+                ],
+                answer: "c-a-b",
+                explanation: {
+                    translation: "Dịch nghĩa các câu thoại:<br>a. Brian: Tớ cũng vậy, Ally. Cuộc sống thành phố quá ồn ào đối với tớ.<br>b. Ally: Và hãy nhìn những cánh đồng xanh ngát kìa! Thật thanh bình làm sao.<br>c. Ally: Ở đây thật yên tĩnh, Brian ạ. Tớ yêu không khí trong lành nơi đây!",
+                    vocab: "Phân tích logic hội thoại:<br>- Câu mở đầu phải là một câu khơi gợi hoặc đưa ra cảm nhận đầu tiên về không gian mới -> Chọn câu (c).<br>- Câu (a) có cụm từ 'Me too' (Tớ cũng vậy) thể hiện sự đồng ý với câu của Ally liền trước, đồng thời giải thích thêm lý do ghét thành phố -> Phải đứng sau câu (c).<br>- Câu (b) tiếp tục bằng từ nối 'And...' (Và...) để mở rộng thêm cảnh đẹp cánh đồng -> Đứng ở vị trí cuối cùng.",
+                    whyCorrect: "Do đó, trình tự logic tạo nên đoạn hội thoại hoàn chỉnh và có nghĩa nhất bắt buộc phải là c - a - b.",
+                    whyWrong: "Các phương án phối hợp khác đều làm đứt gãy mạch logic, ví dụ đặt câu có chữ 'And' hoặc 'Me too' lên đầu là sai ngữ pháp hội thoại."
+                }
+            },
+            {
+                id: 7,
+                section: "Exercise 17: Choose the correct answer (A, B, C, or D) to arrange the following sentences into a meaningful conversation.",
+                type: "conversation",
+                speaker: "a. Brian: That's true. And everyone is so friendly in the village.\nb. Ally: Not really. We can get fresh food from the farm here.\nc. Brian: Do you ever miss the shops in the city, Ally?",
+                options: [
+                    "a-b-c",
+                    "c-a-b",
+                    "b-a-c",
+                    "c-b-a"
+                ],
+                answer: "c-b-a",
+                explanation: {
+                    translation: "Dịch nghĩa các câu thoại:<br>a. Brian: Đúng vậy đấy. Và mọi người ở trong làng ai cũng thật thân thiện.<br>b. Ally: Không hẳn đâu. Chúng ta có thể lấy thức ăn tươi sạch từ nông trại ở ngay đây mà.<br>c. Brian: Có bao giờ cậu nhớ các cửa hàng ở trên thành phố không, Ally?",
+                    vocab: "Phân tích logic hội thoại:<br>- Câu (c) là câu hỏi nghi vấn khởi đầu 'Do you ever miss...?' để mở ra chủ đề trò chuyện.<br>- Câu (b) bắt đầu bằng 'Not really' (Không hẳn) để phủ định trực tiếp cho câu hỏi của Brian, giải thích lý do vì có đồ ăn tươi từ nông trại.<br>- Câu (a) bắt đầu bằng 'That's true' (Đúng vậy) thể hiện sự đồng tình của Brian với lý lẽ của Ally và khen thêm người dân trong làng.",
+                    whyCorrect: "Mạch hội thoại chạy vô cùng mượt mà theo trình tự Hỏi (c) -> Trả lời phủ định (b) -> Đồng tình mở rộng (a). Vậy đáp án là c - b - a.",
+                    whyWrong: "Các lựa chọn khác đưa câu khẳng định hoặc câu phản biện lên trước câu hỏi gốc, khiến cấu trúc hội thoại hoàn toàn lộn xộn."
+                }
+            },
+            {
+                id: 8,
+                section: "Exercise 17: Choose the correct answer (A, B, C, or D) to arrange the following sentences into a meaningful conversation.",
+                type: "conversation",
+                speaker: "a. Brian: Me too, Ally. It's much quieter than the city, isn't it?\nb. Ally: It's so lovely here, Brian. I really enjoy the peaceful countryside.\nc. Ally: It a great place to live, especially with all the fresh food from the farms.\nd. Brian: Yes, and the air feels so much cleaner here.\ne. Ally: Definitely! And I love waking up to the sound of birds instead of traffic.",
+                options: [
+                    "b-a-d-e-c",
+                    "b-a-e-d-c",
+                    "c-b-a-d-e",
+                    "b-e-a-d-c"
+                ],
+                answer: "b-a-d-e-c",
+                explanation: {
+                    translation: "Dịch nghĩa các câu thoại:<br>a. Brian: Tớ cũng thế Ally. Nơi này yên tĩnh hơn thành phố nhiều đúng không?<br>b. Ally: Ở đây thật tuyệt Brian à. Tớ thực sự tận hưởng vùng nông thôn yên bình này.<br>c. Ally: Đây là một nơi tuyệt vời để sống, đặc biệt là với tất cả thực phẩm tươi sống từ các trang trại.<br>d. Brian: Đúng vậy, và không khí ở đây cảm giác trong lành hơn rất nhiều.<br>e. Ally: Chắc chắn rồi! Và tớ thích thức dậy với tiếng chim hót thay vì tiếng xe cộ đi lại.",
+                    vocab: "Sắp xếp chuỗi logic nâng cao:<br>1. Câu (b) giới thiệu cảm xúc tổng quan về nông thôn.<br>2. Câu (a) Brian đáp lại bằng 'Me too' và hỏi thêm ý kiến 'isn't it?'.<br>3. Câu (d) nói tiếp về việc không khí sạch sẽ hơn sau khi câu (a) nhắc đến sự yên tĩnh.<br>4. Câu (e) Ally thốt lên 'Definitely!' để đồng ý với chuyện không khí và kể chuyện tiếng chim hót thay vì xe cộ.<br>5. Câu (c) đúc kết lại bằng một nhận xét tổng quan mang tính kết luận: 'It's a great place to live...'.",
+                    whyCorrect: "Ghép nối toàn bộ các móc xích hội thoại trên, ta được một mạch văn hoàn chỉnh duy nhất là b - a - d - e - c.",
+                    whyWrong: "Các đáp án nhiễu còn lại phá hỏng cặp phản hồi 'isn't it? - Definitely!' hoặc đặt sai vị trí câu bổ trợ mang từ khóa nối tiếp."
+                }
+            }
+        ];
+
+        // Khởi tạo Web Audio API để sinh âm thanh trực tiếp (Không cần file mp3 bên ngoài)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'correct') {
+                // Tiếng Chime/Ding trong trẻo cao độ tăng dần
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else {
+                // Tiếng Téo tèo tèo trầm, rè vui nhộn
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, audioCtx.currentTime); 
+                osc.frequency.linearRampToValueAtTime(90, audioCtx.currentTime + 0.25); 
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            }
+        }
+
+        // Thuật toán Fisher-Yates xáo trộn các đáp án ngẫu nhiên khi tải trang
+        function shuffleOptions(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Trạng thái lưu trữ đáp án học sinh chọn
+        let studentAnswers = {};
+
+        // Sinh giao diện bài thi tự động
+        function renderQuiz() {
+            const wrapper = document.getElementById('quiz-wrapper');
+            wrapper.innerHTML = "";
+            let currentSection = "";
+
+            quizQuestions.forEach((q) => {
+                // Thêm tiêu đề phần bài nếu có sự thay đổi bài tập
+                if (currentSection !== q.section) {
+                    currentSection = q.section;
+                    const secTitle = document.createElement('div');
+                    secTitle.className = "section-title";
+                    secTitle.innerText = currentSection;
+                    wrapper.appendChild(secTitle);
+                }
+
+                // Tạo thẻ Card cho từng câu hỏi
+                const card = document.createElement('div');
+                card.className = "quiz-card";
+                card.id = `card_q_${q.id}`;
+
+                // Nội dung câu hỏi/hội thoại
+                const textDiv = document.createElement('div');
+                textDiv.className = "question-text";
+                textDiv.innerText = `Câu hỏi ${q.id}:`;
+                card.appendChild(textDiv);
+
+                const convoBox = document.createElement('div');
+                convoBox.className = "conversation-box";
+                convoBox.innerText = q.speaker;
+                card.appendChild(convoBox);
+
+                // Tạo danh sách nút chọn đáp án
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = "options-container";
+
+                // Xáo trộn mảng đáp án copy
+                const dynamicOptions = shuffleOptions([...q.options]);
+
+                dynamicOptions.forEach(opt => {
+                    const btn = document.createElement('button');
+                    btn.className = "option-btn";
+                    btn.innerText = opt;
+                    btn.onclick = function() { selectOption(this, q.id, opt, q.answer); };
+                    optionsDiv.appendChild(btn);
+                });
+
+                card.appendChild(optionsDiv);
+
+                // Tạo khối giải thích siêu chi tiết (ẩn mặc định)
+                const expBox = document.createElement('div');
+                expBox.className = "explanation-box";
+                expBox.id = `explanation_${q.id}`;
+                expBox.innerHTML = `
+                    <h4>💡 GIẢI THÍCH CHI TIẾT TỪ MS LÊ HẰNG:</h4>
+                    <p><b>1. Dịch nghĩa:</b> ${q.explanation.translation}</p>
+                    <p><b>2. Từ vựng & Đáp án:</b> ${q.explanation.vocab}</p>
+                    <p style="color: var(--correct-color)"><b>3. Tại sao đúng:</b> ${q.explanation.whyCorrect}</p>
+                    <p style="color: var(--wrong-color)"><b>4. Tại sao sai:</b> ${q.explanation.whyWrong}</p>
+                `;
+                card.appendChild(expBox);
+
+                wrapper.appendChild(card);
+            });
+        }
+
+        // Xử lý sự kiện bấm chọn đáp án trắc nghiệm
+        function selectOption(selectedBtn, qId, chosenValue, correctValue) {
+            // Khóa không cho bấm lại câu đã làm để giữ kỷ luật phòng thi
+            if (studentAnswers[qId] !== undefined) return;
+
+            studentAnswers[qId] = chosenValue;
+            const container = selectedBtn.parentElement;
+            const allButtons = container.querySelectorAll('.option-btn');
+
+            if (chosenValue === correctValue) {
+                selectedBtn.classList.add('correct');
+                playSound('correct');
+                triggerSingleConfetti();
+            } else {
+                selectedBtn.classList.add('wrong');
+                playSound('wrong');
+                // Tự động làm nổi bật đáp án đúng màu xanh để học sinh đối chiếu nhanh
+                allButtons.forEach(b => {
+                    if (b.innerText === correctValue) {
+                        b.classList.add('correct');
+                    }
+                });
+            }
+
+            // Hiện ngay lập tức hộp giải thích chi tiết bên dưới câu hỏi vừa làm
+            document.getElementById(`explanation_${qId}`).style.display = "block";
+        }
+
+        // Logic chấm điểm khi bấm nút Nộp bài
+        function gradeQuiz() {
+            let score = 0;
+            let total = quizQuestions.length;
+
+            quizQuestions.forEach(q => {
+                if (studentAnswers[q.id] === q.answer) {
+                    score++;
+                }
+            });
+
+            const percent = (score / total) * 100;
+            const modal = document.getElementById('score-modal');
+            const scoreText = document.getElementById('score-text');
+            const feedbackText = document.getElementById('feedback-text');
+
+            scoreText.innerText = `${score} / ${total}`;
+
+            // Cấu trúc lời nhận xét động viên theo đúng mức điểm yêu cầu
+            if (percent >= 90) {
+                feedbackText.innerHTML = "🌟 <b>Làm tốt lắm!</b> Con cố gắng rinh điểm 10 ở lần sau nha! 👑";
+                runFullConfetti();
+            } else if (percent >= 60) {
+                feedbackText.innerHTML = "✨ <b>Con đã có tiến bộ khá ổn rồi!</b> Con cố gắng đọc kĩ giải thích đáp án và làm lại nha. Cô tin con sẽ làm tốt hơn ở lần sau! 💕";
+                runFullConfetti();
+            } else {
+                feedbackText.innerHTML = "💪 <b>Điểm lần này chưa cao lắm!</b> Con cố gắng đọc kĩ giải thích đáp án và làm lại nha. Cô tin con sẽ làm tốt hơn ở lần sau! Đừng nản chí nhé con yêu!";
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('score-modal').classList.remove('active');
+            // Tự động reset trạng thái để học sinh làm lại từ đầu nâng cao kỹ năng
+            studentAnswers = {};
+            renderQuiz();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // HIỆU ỨNG PHÁO GIẤY CANVAS (CONFETTI)
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let confettiArray = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function triggerSingleConfetti() {
+            for (let i = 0; i < 30; i++) {
+                confettiArray.push({
+                    x: Math.random() * canvas.width,
+                    y: canvas.height,
+                    size: Math.random() * 6 + 4,
+                    color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                    speedY: Math.random() * -8 - 5,
+                    speedX: Math.random() * 6 - 3,
+                    rotation: Math.random() * 360,
+                    rotationSpeed: Math.random() * 4 - 2
+                });
+            }
+            animateConfetti();
+        }
+
+        function runFullConfetti() {
+            for (let i = 0; i < 150; i++) {
+                confettiArray.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height - canvas.height,
+                    size: Math.random() * 7 + 4,
+                    color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                    speedY: Math.random() * 4 + 2,
+                    speedX: Math.random() * 4 - 2,
+                    rotation: Math.random() * 360,
+                    rotationSpeed: Math.random() * 6 - 3
+                });
+            }
+            animateConfetti();
+        }
+
+        function animateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let active = false;
+
+            confettiArray.forEach((p, index) => {
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate((p.rotation * Math.PI) / 180);
+                ctx.fillStyle = p.color;
+                ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                ctx.restore();
+
+                p.y += p.speedY;
+                p.x += p.speedX;
+                p.rotation += p.rotationSpeed;
+
+                if (p.y <= canvas.height && p.y >= -20 && p.x >= 0 && p.x <= canvas.width) {
+                    active = true;
+                }
+            });
+
+            if (active) {
+                requestAnimationFrame(animateConfetti);
+            } else {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                confettiArray = [];
+            }
+        }
+
+        // Tự động thực thi khi mở trang web
+        window.onload = function() {
+            renderQuiz();
+        };
+    </script>
+</body>
+</html>
